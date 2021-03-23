@@ -1,0 +1,67 @@
+﻿{
+  "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "cosmosDbName": {
+      "type": "string"
+    },
+    "location": {
+      "type": "string"
+    },
+    "databaseName": {
+      "type": "string"
+    }
+  },
+  "resources": [
+    {
+      "apiVersion": "2020-04-01",
+      "kind": "GlobalDocumentDB",
+      "type": "Microsoft.DocumentDb/databaseAccounts",
+      "name": "[parameters('cosmosDbName')]",
+      "location": "[parameters('location')]",
+      "properties": {
+        "databaseAccountOfferType": "Standard",
+        "locations": [
+          {
+            "id": "[concat(parameters('cosmosDbName'), '-', parameters('location'))]",
+            "failoverPriority": 0,
+            "locationName": "[parameters('location')]"
+          }
+        ],
+        "backupPolicy": {
+          "type": "Periodic",
+          "periodicModeProperties": {
+            "backupIntervalInMinutes": 240,
+            "backupRetentionIntervalInHours": 8
+          }
+        },
+        "isVirtualNetworkFilterEnabled": false,
+        "virtualNetworkRules": [],
+        "ipRules": [],
+        "dependsOn": [],
+        "enableMultipleWriteLocations": false,
+        "capabilities": [],
+        "enableFreeTier": false
+      },
+      "tags": {
+        "defaultExperience": "Core (SQL)",
+        "hidden-cosmos-mmspecial": "",
+        "CosmosAccountType": "Non-Production"
+      }
+    },
+    {
+      "type": "Microsoft.DocumentDB/databaseAccounts/sqlDatabases",
+      "name": "[concat(parameters('cosmosDbName'), '/', parameters('databaseName'))]",
+      "apiVersion": "2021-01-15",
+      "dependsOn": [
+        "[resourceId('Microsoft.DocumentDB/databaseAccounts', parameters('cosmosDbName'))]"
+      ],
+      "properties": {
+        "resource": {
+          "id": "[parameters('databaseName')]"
+        }
+      }
+    }
+  ],
+  "outputs": {}
+}

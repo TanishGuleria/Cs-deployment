@@ -1,0 +1,102 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "_artifactsLocation": {
+      "type": "string"
+    },
+    "_artifactsLocationSasToken": {
+      "type": "securestring"
+    },
+    "envCode": {
+      "type": "string",
+      "defaultValue": "d",
+      "metadata": {
+        "description": "specify the value of environment code"
+      }
+    },
+    "location": {
+      "type": "string",
+      "defaultValue": "East US",
+      "metadata": {
+        "description": "specify the value of location"
+      }
+    },
+    "locCode": {
+      "type": "string",
+      "defaultValue": "eus",
+      "metadata": {
+        "description": "specify the value of location code"
+      }
+    }
+  },
+  "variables": {
+    //Template location
+    "templateFolderName": "Templates",
+
+    //IotHub Details
+    "iotHubName": "[concat('iothub-','connected-store-',parameters('locCode'),'-',parameters('envCode'),'-01')]",
+    "iotHubTemplateFileName": "IotHub.json",
+
+    //CosmosDb Details
+    "cosmosDbName": "[concat('Cosmosdb-','connected-store-',parameters('locCode'),'-',parameters('envCode'),'-01')]",
+    "cosmosDbTemplateFileName": "CosmosDb.json",
+    "cosmosresourceId": "[resourceId('Microsoft.DocumentDB/databaseAccounts', variables('cosmosDbName'))]",
+    "cosmosapiVersion": "[providers('Microsoft.DocumentDB', 'databaseAccounts').apiVersions[0]]"
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-05-01",
+      "name": "IotHub",
+      "dependsOn": [],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[concat(parameters('_artifactsLocation'), variables('templateFolderName'), '/', variables('iotHubTemplateFileName'), parameters('_artifactsLocationSasToken'))]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "iotHubName": {
+            "value": "[variables('iotHubName')]"
+          },
+          "location": {
+            "value": "[parameters('location')]"
+          }
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-05-01",
+      "name": "CosmosDb",
+      "dependsOn": [],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[concat(parameters('_artifactsLocation'), variables('templateFolderName'), '/', variables('cosmosDbTemplateFileName'), parameters('_artifactsLocationSasToken'))]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "cosmosDbName": {
+            "value": "[variables('cosmosDbName')]"
+          },
+          "location": {
+            "value": "[parameters('location')]"
+          }
+        }
+      }
+    }
+  ],
+  "outputs": {
+
+    "iotHubConnectionString": {
+      "type": "string",
+      "value": "[concat('HostName=', reference(resourceId('Microsoft.Devices/IoTHubs', variables('iotHubName')), providers('Microsoft.Devices', 'IoTHubs').apiVersions[0]).hostName, ';SharedAccessKeyName=iothubowner;SharedAccessKey=', listKeys(resourceId('Microsoft.Devices/IotHubs', variables('iotHubName')), providers('Microsoft.Devices', 'IoTHubs').apiVersions[0]).value[0].primaryKey)]"
+    },
+    "cosmosdbConnectionString": {
+      "type": "string",
+      "value": "[concat('AccountEndpoint=https://', variables('cosmosDbName'), '.documents.azure.com:443/;AccountKey=', listKeys(variables('cosmosresourceId'), variables('cosmosapiVersion')).primaryMasterKey, ';')]"
+    }
+  }
+}

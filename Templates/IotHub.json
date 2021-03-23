@@ -39,7 +39,7 @@
             "eventHubs": [],
             "storageContainers": []
           },
-          "routes": []
+          "routes": [] 
         }
       }
     }

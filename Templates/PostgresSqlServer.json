@@ -1,0 +1,78 @@
+﻿{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "location": {
+      "type": "string"
+    },
+    "postgresqlServerName": {
+      "type": "string"
+    },
+    "postgresqlDatabaseName": {
+      "type": "string"
+    },
+    "administratorLogin": {
+      "type": "string"
+    },
+    "administratorLoginPassword": {
+      "type": "securestring"
+    }
+  },
+  "variables": {
+  },
+  "resources": [
+    {
+      "type": "Microsoft.DBforPostgreSQL/servers",
+      "apiVersion": "2017-12-01",
+      "name": "[parameters('postgresqlServerName')]",
+      "location": "[resourceGroup().location]",
+      "sku": {
+        "name": "GP_Gen5_4",
+        "tier": "GeneralPurpose",
+        "family": "Gen5",
+        "capacity": 2
+      },
+      "properties": {
+        "administratorLogin": "[parameters('administratorLogin')]",
+        "administratorLoginPassword": "[parameters('administratorLoginPassword')]",
+        "infrastructureEncryption": "Disabled",
+        "minimalTlsVersion": "TLS1_2",
+        "publicNetworkAccess": "Enabled",
+        "sslEnforcement": "Enabled",
+        "storageProfile": {
+          "storageMB": 51200,
+          "backupRetentionDays": 7,
+          "geoRedundantBackup": "Disabled",
+          "storageAutogrow": "Enabled"
+        },
+        "version": "11"
+      }
+    },
+    {
+      "type": "Microsoft.DBforPostgreSQL/servers/databases",
+      "apiVersion": "2017-12-01",
+      "name": "[concat(parameters('postgresqlServerName'), '/', parameters('postgresqlDatabaseName'))]",
+      "dependsOn": [
+        "[resourceId('Microsoft.DBforPostgreSQL/servers', parameters('postgresqlServerName'))]"
+      ],
+      "properties": {
+        "charset": "UTF8",
+        "collation": "English_United States.1252"
+      }
+  ],
+  "outputs": {
+
+    "postgresqlConnectionString": {
+      "type": "string",
+      "value": "[concat('Database=', parameters('postgresqlDatabaseName'), ';Server=', parameters('postgresqlServerName'), '.postgres.database.azure.com;Port=5432;User Id=', parameters('administratorLogin'),'@', parameters('postgresqlServerName'),';Password=', parameters('administratorLoginPassword'),';Ssl Mode=Require;')]"
+    },
+    "postgresqlUserName": {
+      "type": "string",
+      "value": "[concat(parameters('administratorLogin'),'@', parameters('postgresqlServerName'))]"
+    },
+    "postgresqlPassword": {
+      "type": "string",
+      "value": "[parameters('administratorLoginPassword')]"
+    }
+  }
+}

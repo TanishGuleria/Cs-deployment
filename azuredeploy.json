@@ -40,8 +40,14 @@
 
     //CosmosDb Details
     "cosmosDbName": "[concat('Cosmosdb-','connected-store-',parameters('locCode'),'-',parameters('envCode'),'-01')]",
-    "cosmosDbTemplateFileName": "CosmosDb.json"
+    "cosmosDbTemplateFileName": "CosmosDb.json",
 
+    //Postgres Details
+    "postgresqlServerTemplateFileName": "PostgresSqlServer.json",
+    "postgresqlServerName": "[concat('Postgres-','connected-store-',parameters('locCode'),'-',parameters('envCode'),'-01')]",
+    "postgresqlDatabaseName": "connectedstore",
+    "administratorLogin": "----------",
+    "administratorLoginPassword": "-----------"
   },
   "resources": [
     {
@@ -73,6 +79,36 @@
       "properties": {
         "mode": "Incremental",
         "templateLink": {
+          "uri": "[concat(parameters('_artifactsLocation'), variables('templateFolderName'), '/', variables('postgresqlServerTemplateFileName'), parameters('_artifactsLocationSasToken'))]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "postgresqlServerName": {
+            "value": "[variables('postgresqlServerName')]"
+          },
+          "postgresqlDatabaseName": {
+            "value": "[variables('postgresqlDatabaseName')]"
+          },
+          "administratorLogin": {
+            "value": "[variables('administratorLogin')]"
+          },
+          "administratorLoginPassword": {
+            "value": "[variables('administratorLoginPassword')]"
+          },
+          "location": {
+            "value": "[parameters('location')]"
+          }
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-05-01",
+      "name": "Postgres",
+      "dependsOn": [],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
           "uri": "[concat(parameters('_artifactsLocation'), variables('templateFolderName'), '/', variables('cosmosDbTemplateFileName'), parameters('_artifactsLocationSasToken'))]",
           "contentVersion": "1.0.0.0"
         },
@@ -95,6 +131,18 @@
     "cosmosdbConnectionString": {
       "type": "string",
       "value": "[reference('CosmosDB').outputs.cosmosdbConnectionString.value]"
+    },
+    "postgresqlConnectionString": {
+      "type": "string",
+      "value": "[reference('Postgres').outputs.postgresqlConnectionString.value]"
+    },
+    "postgresqlUserName": {
+      "type": "string",
+      "value": "[reference('Postgres').outputs.postgresqlUserName.value]"
+    },
+    "postgresqlPassword": {
+      "type": "string",
+      "value": "[reference('Postgres').outputs.postgresqlPassword.value]"
     }
   }
   }

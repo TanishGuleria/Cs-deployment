@@ -40,9 +40,8 @@
 
     //CosmosDb Details
     "cosmosDbName": "[concat('Cosmosdb-','connected-store-',parameters('locCode'),'-',parameters('envCode'),'-01')]",
-    "cosmosDbTemplateFileName": "CosmosDb.json",
-    "cosmosresourceId": "[resourceId('Microsoft.DocumentDB/databaseAccounts', variables('cosmosDbName'))]",
-    "cosmosapiVersion": "[providers('Microsoft.DocumentDB', 'databaseAccounts').apiVersions[0]]"
+    "cosmosDbTemplateFileName": "CosmosDb.json"
+
   },
   "resources": [
     {
@@ -89,14 +88,14 @@
     }
   ],
   "outputs": {
-
     "iotHubConnectionString": {
       "type": "string",
-      "value": "[concat('HostName=', reference(resourceId('Microsoft.Devices/IoTHubs', variables('iotHubName')), providers('Microsoft.Devices', 'IoTHubs').apiVersions[0]).hostName, ';SharedAccessKeyName=iothubowner;SharedAccessKey=', listKeys(resourceId('Microsoft.Devices/IotHubs', variables('iotHubName')), providers('Microsoft.Devices', 'IoTHubs').apiVersions[0]).value[0].primaryKey)]"
+      "value": "[reference('Iothub').outputs.iotHubConnectionString.value]"
     },
     "cosmosdbConnectionString": {
       "type": "string",
-      "value": "[concat('AccountEndpoint=https://', variables('cosmosDbName'), '.documents.azure.com:443/;AccountKey=', listKeys(variables('cosmosresourceId'), variables('cosmosapiVersion')).primaryMasterKey, ';')]"
+      "value": "[reference('CosmosDB').outputs.cosmosdbConnectionString.value]"
     }
+  }
   }
 }

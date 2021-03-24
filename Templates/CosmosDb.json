@@ -12,6 +12,10 @@
       "type": "string"
     }
   },
+  "variables": {
+    "cosmosresourceId": "[resourceId('Microsoft.DocumentDB/databaseAccounts', parameters('cosmosDbName'))]",
+    "cosmosapiVersion": "[providers('Microsoft.DocumentDB', 'databaseAccounts').apiVersions[0]]"
+  },
   "resources": [
     {
       "apiVersion": "2020-04-01",
@@ -48,20 +52,12 @@
         "hidden-cosmos-mmspecial": "",
         "CosmosAccountType": "Non-Production"
       }
-    },
-    {
-      "type": "Microsoft.DocumentDB/databaseAccounts/sqlDatabases",
-      "name": "[concat(parameters('cosmosDbName'), '/', parameters('databaseName'))]",
-      "apiVersion": "2021-01-15",
-      "dependsOn": [
-        "[resourceId('Microsoft.DocumentDB/databaseAccounts', parameters('cosmosDbName'))]"
-      ],
-      "properties": {
-        "resource": {
-          "id": "[parameters('databaseName')]"
-        }
-      }
     }
   ],
-  "outputs": {}
+  "outputs": {
+    "cosmosdbConnectionString": {
+      "type": "string",
+      "value": "[concat('AccountEndpoint=https://', parameters('cosmosDbName'), '.documents.azure.com:443/;AccountKey=', listKeys(variables('cosmosresourceId'), variables('cosmosapiVersion')).primaryMasterKey, ';')]"
+    }
+  }
 }

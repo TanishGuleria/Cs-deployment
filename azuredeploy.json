@@ -17,7 +17,7 @@
     },
     "location": {
       "type": "string",
-      "defaultValue": "East US",
+      "defaultValue": "eastus",
       "metadata": {
         "description": "specify the value of location"
       }
@@ -39,15 +39,15 @@
     "iotHubTemplateFileName": "IotHub.json",
 
     //CosmosDb Details
-    "cosmosDbName": "[concat('Cosmosdb-','connected-store-',parameters('locCode'),'-',parameters('envCode'),'-01')]",
+    "cosmosDbName": "[concat('cosmosdb-','connected-store-',parameters('locCode'),'-',parameters('envCode'),'-01')]",
     "cosmosDbTemplateFileName": "CosmosDb.json",
 
     //Postgres Details
     "postgresqlServerTemplateFileName": "PostgresSqlServer.json",
     "postgresqlServerName": "[concat('Postgres-','connected-store-',parameters('locCode'),'-',parameters('envCode'),'-01')]",
-    "postgresqlDatabaseName": "connectedstoredev01",
-    "administratorLogin": "connectedstoredev01",
-    "administratorLoginPassword": "dev01$admin"
+    "postgresqlDatabaseName": "ctedstoredev01tsg",
+    "administratorLogin": "connectedstoredev01tsf",
+    "administratorLoginPassword": "T@nish47"
   },
   "resources": [
     {
@@ -100,7 +100,7 @@
       "properties": {
         "mode": "Incremental",
         "templateLink": {
-          "uri": "[concat(parameters('_artifactsLocation'), variables('templateFolderName'), '/', variables('cosmosDbTemplateFileName'), parameters('_artifactsLocationSasToken'))]",
+          "uri": "[concat(parameters('_artifactsLocation'), variables('templateFolderName'), '/', variables('postgresqlServerTemplateFileName'), parameters('_artifactsLocationSasToken'))]",
           "contentVersion": "1.0.0.0"
         },
         "parameters": {

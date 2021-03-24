@@ -25,8 +25,8 @@
       "name": "[parameters('postgresqlServerName')]",
       "location": "[resourceGroup().location]",
       "sku": {
-        "name": "GP_Gen5_4",
-        "tier": "GeneralPurpose",
+        "name": "B_Gen5_2",
+        "tier": "Basic",
         "family": "Gen5",
         "capacity": 2
       },
@@ -74,5 +74,4 @@
       "value": "[parameters('administratorLoginPassword')]"
     }
   }
-}
 }

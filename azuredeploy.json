@@ -45,9 +45,9 @@
     //Postgres Details
     "postgresqlServerTemplateFileName": "PostgresSqlServer.json",
     "postgresqlServerName": "[concat('Postgres-','connected-store-',parameters('locCode'),'-',parameters('envCode'),'-01')]",
-    "postgresqlDatabaseName": "connectedstore",
-    "administratorLogin": "----------",
-    "administratorLoginPassword": "-----------"
+    "postgresqlDatabaseName": "connectedstoredev01",
+    "administratorLogin": "connectedstoredev01",
+    "administratorLoginPassword": "dev01$admin"
   },
   "resources": [
     {
